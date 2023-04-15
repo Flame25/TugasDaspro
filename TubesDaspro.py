@@ -466,6 +466,8 @@ def Help():
         print("   Untuk keluar dari akun yang digunakan sekarang")
         print("2. summonjin")
         print("   Untuk memanggil jin")
+        print("3. hilangkanjin")
+        print("   Untuk menghapus\menghilangkan jin")
     elif(userName == "Roro") : 
         print("1. logout")
         print("   Untuk keluar dari akun yang digunakan sekarang")
