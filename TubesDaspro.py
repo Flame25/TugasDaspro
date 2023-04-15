@@ -59,9 +59,10 @@ def initializeArray (array : list, n :int, m:int, array2:list , n2:int) :
     return newArray
 def initializeArray2 (array : list, n :int, m:int, array2:list , n2:int) : 
     newArray = [["" for i in range(m)] for i in range(n+n2)]
-    for j in range(0,m): 
-        newArray[0][j] = array[0][j]
-    
+    for i in range(n): 
+        for j in range(m): 
+            newArray[i][j] = array[i][j]
+
     for i in range(n2): 
         for j in range(m): 
             newArray[i + n][j] = array2[i][j]
@@ -232,7 +233,7 @@ def summonJin():
     loadUserFile()
 
 def loadBahanBangunan(): 
-    global totalBatu,totalAir,totalPasir
+    global totalBatu,totalAir,totalPasir, bahanBangunan
     bahanBangunan = load("bahan_bangunan.csv",3)
     if(panjangFile("bahan_bangunan.csv") > 1): 
         totalPasir = int(bahanBangunan[1][2])
@@ -365,6 +366,7 @@ def Kumpul():
     print("Jin menemukan " + str(nPasir) + " pasir "  + str(nBatu) + " batu " + str(nAir) + " air")
     arrayTemp = [["Pasir","sebuah pasir",str(nPasir)], ["Batu","sebuah batu", str(nBatu)], ["Air", "sebuah air", str(nAir)]]
     if(panjangFile("bahan_bangunan.csv") == 1): 
+        print(bahanBangunan)
         arrayNew = initializeArray2(bahanBangunan,1, 3, arrayTemp, 3)
         writeFile("bahan_bangunan.csv", arrayNew, 4 , 3)
     else : 
@@ -372,8 +374,25 @@ def Kumpul():
         bahanBangunan[2][2] = str(totalBatu)
         bahanBangunan[3][2] = str(totalAir)
         writeFile("bahan_bangunan.csv", bahanBangunan, panjangFile("bahan_bangunan.csv"),3)
-    load("bahan_bangunan.csv",3)
-    if(panjangFile("bahan_bangunan.csv")>1): loadBahanBangunan()
+    loadBahanBangunan()
+def cekId(id:int): 
+    for i in range(panjangFile("candi.csv")): 
+        if(id == daftarCandi[i][0]): 
+            return True
+    return False
+
+def hancurkanCandi(): 
+    while True : 
+        idCandi = input("Masukkan id candi: ")
+        if(cekId(idCandi)) : 
+            break
+    while True : 
+        konfirmasiUser = input("Apakah anda yakin ingin menghancurkan candi ID: "+ idCandi+ "  (Y/N)?") 
+        if(konfirmasiUser == "y" or konfirmasiUser =="Y"): 
+            break; 
+        else: 
+            return 0
+    
 def Bangun(): 
     global totalPasir, totalBatu, totalAir, daftarCandi, bahanBangunan
     nPasir = lcg(151873,3112,50603)
