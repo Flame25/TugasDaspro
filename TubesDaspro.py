@@ -176,6 +176,8 @@ def switch(userCommand):
         Exit()
     elif(userCommand == "help"): 
         Help()
+    elif(userCommand == "hancurkancandi"):
+        hancurkanCandi()
 
 def logIn(): 
     print("Silahkan masukkan username Anda")
@@ -359,7 +361,7 @@ def Kumpul():
     global totalBatu, totalPasir, totalAir, bahanBangunan
     nPasir = lcg(151811,3112,50603)
     nBatu =lcg(151813,3112,50603)
-    nAir = lcg(151817,3112,50603)
+    nAir = lcg(1518019,3112,50605)   
     totalBatu += nBatu
     totalAir += nAir
     totalPasir += nPasir
@@ -386,12 +388,26 @@ def hancurkanCandi():
         idCandi = input("Masukkan id candi: ")
         if(cekId(idCandi)) : 
             break
+        else : 
+            print("Tidak ada candi dengan id  " +  idCandi)
     while True : 
-        konfirmasiUser = input("Apakah anda yakin ingin menghancurkan candi ID: "+ idCandi+ "  (Y/N)?") 
+        konfirmasiUser = input("Apakah anda yakin ingin menghancurkan candi ID: "+ idCandi+ "  (Y/N)? ") 
         if(konfirmasiUser == "y" or konfirmasiUser =="Y"): 
             break; 
         else: 
             return 0
+    arrayNew = [["" for i in range(5)] for i in range(panjangFile("candi.csv") -1)]
+    x = 0
+    for i in range(panjangFile("candi.csv") -1 ):
+        if(daftarCandi[i][0] == idCandi):
+            x+=1
+        for j in range(5): 
+                arrayNew[i][j] = daftarCandi[x][j]
+        else : x += 1
+    print(arrayNew)
+    writeFile("candi.csv", arrayNew, panjangFile("candi.csv")-1 ,5)
+    print("Candi dengan id " + idCandi + " berhasil dihapus")
+    loadDaftarCandi()
     
 def Bangun(): 
     global totalPasir, totalBatu, totalAir, daftarCandi, bahanBangunan
@@ -406,7 +422,11 @@ def Bangun():
         totalPasir -= nPasir
         totalAir -= nAir
         totalBatu -= nBatu
-        arrayTemp = [str(panjangFile("candi.csv")), userName, str(nPasir), str(nBatu),str(nAir)]
+        idCandi = 0
+        for i in range(1,panjangFile("candi.csv")): 
+            if(i == panjangFile("candi.csv") -1  or i != int(daftarCandi[i][0]) ): 
+                idCandi = i
+        arrayTemp = [str(idCandi), userName, str(nPasir), str(nBatu),str(nAir)]
         if(panjangFile("candi.csv") -1 < 100): 
             arrayNew = initializeArray(daftarCandi, panjangFile("candi.csv"),5, arrayTemp,1)
             writeFile("candi.csv", arrayNew, panjangFile("candi.csv") + 1, 5)
