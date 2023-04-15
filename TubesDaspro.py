@@ -27,7 +27,6 @@ def panjangFile(namaFile):
         i+=1 
     return i-1
 
-
 def length(nString:str): 
     nMark : chr = '.'
     nString+= nMark
@@ -60,9 +59,8 @@ def initializeArray (array : list, n :int, m:int, array2:list , n2:int) :
     return newArray
 def initializeArray2 (array : list, n :int, m:int, array2:list , n2:int) : 
     newArray = [["" for i in range(m)] for i in range(n+n2)]
-    for i in range(n):
-        for j in range(m): 
-            newArray[i][j] = array[i][j]
+    for j in range(0,m): 
+        newArray[0][j] = array[0][j]
     
     for i in range(n2): 
         for j in range(m): 
@@ -117,7 +115,6 @@ def load(namaFile:str,n:int) :  #Prosedur load
         x+=1
         isiFile = f.readline()
     print(tmpArray)
-    print("Data berhasil di-load")
     return tmpArray
         
 def writeFile(namaFile,array,n , m): 
@@ -154,6 +151,7 @@ def switch(userCommand):
         userFile = load("user.csv",3)
         daftarCandi = load("candi.csv",5)
         bahanBangunan = load("bahan_bangunan.csv",3)
+        if(panjangFile("bahan_bangunan.csv")>1): loadBahanBangunan()
     elif(userCommand == "break"): 
         global sedangBerjalan 
         sedangBerjalan = False
@@ -231,7 +229,26 @@ def summonJin():
     arrayTemp = [namaJin, passJin, tipeJin]
     arrayNew = initializeArray(userFile, panjangFile("user.csv"),3,arrayTemp,1)
     writeFile("user.csv",arrayNew,panjangFile("user.csv")+1,3)
-    load("user.csv",3)
+    loadUserFile()
+
+def loadBahanBangunan(): 
+    global totalBatu,totalAir,totalPasir
+    bahanBangunan = load("bahan_bangunan.csv",3)
+    if(panjangFile("bahan_bangunan.csv") > 1): 
+        totalPasir = int(bahanBangunan[1][2])
+        totalBatu = int(bahanBangunan[2][2])
+        totalAir = int(bahanBangunan[3][2])
+    print("Daftar bahan bangunan berhasil di-load")
+
+def loadUserFile():
+    global userFile 
+    userFile = load("user.csv",3)
+    print("Daftar user berhasil di-load")
+
+def loadDaftarCandi(): 
+    global daftarCandi 
+    daftarCandi = load("candi.csv",5)
+    print("Daftar candi berhasil di-load")
 
 def lcg(a : int , c: int, m: int ) -> int : # X = (a*x + c) mod m 
     global seed 
@@ -299,6 +316,7 @@ def ubahTipeJin():
                 userFile[i][2] ="Pembangun"
     writeFile("user.csv", userFile,panjangFile("user.csv"), 3)
     print("Tipe jin berhasil diubah")
+    loadUserFile()
     return 0 
     
 def hapusJin(): 
@@ -323,7 +341,7 @@ def hapusJin():
         x+=1
     writeFile("user.csv", arrayNew, panjangFile("user.csv")-1 ,3)
     print("Jin "+ namaJin + " berhasil dihapus.")
-    load("user.csv",3)
+    loadUserFile()
     
 def ayamBerkokok(): 
     print("Kukuruyuk.. Kukuruyuk..\n")
@@ -347,27 +365,38 @@ def Kumpul():
     print("Jin menemukan " + str(nPasir) + " pasir "  + str(nBatu) + " batu " + str(nAir) + " air")
     arrayTemp = [["Pasir","sebuah pasir",str(nPasir)], ["Batu","sebuah batu", str(nBatu)], ["Air", "sebuah air", str(nAir)]]
     if(panjangFile("bahan_bangunan.csv") == 1): 
-        arrayNew = initializeArray2(bahanBangunan,panjangFile("bahan_bangunan.csv"), 3, arrayTemp, 3)
+        arrayNew = initializeArray2(bahanBangunan,1, 3, arrayTemp, 3)
+        writeFile("bahan_bangunan.csv", arrayNew, 4 , 3)
     else : 
-        bahanBangunan[1][2] += nPasir
-        bahanBangunan[2][2] += nBatu
-        bahanBangunan[3][2] += nAir
-    print(arrayNew)
-    writeFile("bahan_bangunan.csv", arrayNew, panjangFile("bahan_bangunan.csv")+3, 3)
+        bahanBangunan[1][2] = str(totalPasir)
+        bahanBangunan[2][2] = str(totalBatu)
+        bahanBangunan[3][2] = str(totalAir)
+        writeFile("bahan_bangunan.csv", bahanBangunan, panjangFile("bahan_bangunan.csv"),3)
     load("bahan_bangunan.csv",3)
+    if(panjangFile("bahan_bangunan.csv")>1): loadBahanBangunan()
 def Bangun(): 
-    global totalPasir, totalBatu, totalAir
+    global totalPasir, totalBatu, totalAir, daftarCandi, bahanBangunan
     nPasir = lcg(151873,3112,50603)
     nBatu =lcg(151879,3112,50603)
     nAir = lcg(151837,3112,50603)
     print("Bahan yang diperlukan : " + str(nPasir) + " pasir, " + str(nBatu) + " batu, " + str(nAir) +" air")
     if(nPasir <= totalPasir and nAir <= totalAir and nBatu <= totalBatu): 
         print("Candi berhasil dibangun.")
-        sisaCandi =100 - panjangFile("candi.csv")
+        sisaCandi =100 - panjangFile("candi.csv") +1
         print("Sisa candi yang perlu dibangun: " + str(sisaCandi))
         totalPasir -= nPasir
         totalAir -= nAir
         totalBatu -= nBatu
+        arrayTemp = [str(panjangFile("candi.csv")), userName, str(nPasir), str(nBatu),str(nAir)]
+        if(panjangFile("candi.csv") -1 < 100): 
+            arrayNew = initializeArray(daftarCandi, panjangFile("candi.csv"),5, arrayTemp,1)
+            writeFile("candi.csv", arrayNew, panjangFile("candi.csv") + 1, 5)
+            bahanBangunan[1][2] = str(totalPasir)
+            bahanBangunan[2][2] = str(totalBatu)
+            bahanBangunan[3][2] = str(totalAir)
+            writeFile("bahan_bangunan.csv", bahanBangunan, panjangFile("bahan_bangunan.csv"), 3)
+            loadBahanBangunan()
+            loadDaftarCandi()
     else  : 
         print("Bahan bangunan tidak mencukupi")
         print("Candi tidak bisa dibangun!")
@@ -409,9 +438,10 @@ memintaArgs()
 print("Loading...")
 print('Selamat datang di program "Manajerial Candi" ')
 
-userFile = load("user.csv",3)
-daftarCandi = load("candi.csv",5)
-bahanBangunan = load("bahan_bangunan.csv",3)
+loadUserFile()
+loadBahanBangunan()
+loadDaftarCandi()
+
 while sedangBerjalan : 
     x = input(">>>> ")
     switch(x) 
