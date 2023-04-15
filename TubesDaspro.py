@@ -175,6 +175,8 @@ def switch(userCommand):
         Bangun()
     elif(userCommand == "exit"): 
         Exit()
+    elif(userCommand == "help"): 
+        Help()
 
 def logIn(): 
     print("Silahkan masukkan username Anda")
@@ -379,10 +381,29 @@ def Exit():
             writeFile("user.csv", userFile , panjangFileUser,3 )
             writeFile("bahan_bangunan.csv",bahanBangunan, panjangFileBahan,3 )
             writeFile("candi.csv", daftarCandi, panjangFIleCandi,5 )
-            break; 
-        else : 
             break
+        elif(konfirmasiUser == "n" or konfirmasiUser =="N") : 
+            break
+
     sys.exit()
+def Help(): 
+    print("=========== HELP ===========")
+    if(userName == "" and userPass == ""): 
+        print("1. Login")
+        print("   Untuk masuk menggunakan akun")
+        print("2. exit")
+        print("   Untuk keluar dari program dan kembali ke terminal")
+    elif(userName == "Bondowoso"): 
+        print("1. logout")
+        print("   Untuk keluar dari akun yang digunakan sekarang")
+        print("2. summonjin")
+        print("   Untuk memanggil jin")
+    elif(userName == "Roro") : 
+        print("1. logout")
+        print("   Untuk keluar dari akun yang digunakan sekarang")
+        print("2. hancurkancandi")
+        print("   Untuk menghancurkan candi yang tersedia")
+
 #Program Utama
 memintaArgs()
 print("Loading...")
