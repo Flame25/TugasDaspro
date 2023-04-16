@@ -180,7 +180,8 @@ def switch(userCommand):
         hancurkanCandi()
     elif(userCommand == "laporanjin"):
         laporanJin()
-
+    elif(userCommand == "laporancandi"):
+        laporanCandi()
 def logIn(): 
     print("Silahkan masukkan username Anda")
     global userName , userPass
@@ -454,6 +455,51 @@ def jinTerajin():
 
     return minTemp
 
+def getTotal(index: int): 
+    jumlahCandi = panjangFile("candi.csv")
+    cnt = 0
+    for i in range(1, jumlahCandi) : 
+        cnt += int(daftarCandi[i][index]) 
+    return cnt
+def hitungHarga(id:str): 
+    for i in range(panjangFile("candi.csv")):
+        if(daftarCandi[i][0] == id ): 
+            return 10000 * int(daftarCandi[i][2]) + 15000 * int(daftarCandi[i][3]) + int(daftarCandi[i][4]) * 7500
+def candiTermahal():
+    idCandi = daftarCandi[1][0]
+    for i in range(2, panjangFile("candi.csv")):
+        if(hitungHarga(daftarCandi[i][0]) > hitungHarga(idCandi)): 
+            idCandi = daftarCandi[i][0]
+    return idCandi
+
+def candiTermurah():
+    idCandi = daftarCandi[1][0]
+    for i in range(2, panjangFile("candi.csv")):
+        if(hitungHarga(daftarCandi[i][0]) < hitungHarga(idCandi)): 
+            idCandi = daftarCandi[i][0]
+    return idCandi
+
+def laporanCandi(): 
+    if(userName != "Bondowso"): 
+        print("Laporan candi hanya dapat diakses oleh akun Bandung Bondowoso.")
+        return 0
+    
+    totalBatuUse = getTotal(3)
+    totalAirUse = getTotal(4)
+    totalPasirUse = getTotal(2)
+    idCandiTermahal = candiTermahal()
+    idCandiTermurah = candiTermurah()
+    print("> Total Candi : " + str(panjangFile("candi.csv") -1  ))
+    print("> Total Pasir yang diperlukan : " + str(totalPasirUse))
+    print("> Total Batu yang digunakan : " + str(totalBatuUse))
+    print("> Total Air yang digunakna : " + str(totalAirUse))
+    if( panjangFile("candi.csv")  > 2): 
+        print("> Id Candi termahal : " + idCandiTermahal + " (Rp %d)"%(hitungHarga(idCandiTermahal)))
+        print("> Id Candi termurah : " + idCandiTermurah + " (Rp %d)"%(hitungHarga(idCandiTermurah)))
+    else: 
+        print("> Id Candi termahal :  -")
+        print("> id Candi termurah :  -")
+    
 def jinTermalas():
     maxTemp = userFile[3][0]
     for i  in range(3, panjangFile("user.csv")):
@@ -473,7 +519,8 @@ def jumlahJin(tipeJin : str):
     return cnt
 
 def laporanJin(): 
-    if(userName !=  ""):
+    if(userName !=  "Bondowoso"):
+        print("Laporan jin hanya dapat diakses oleh akun Bandung Bondowoso.")
         return 0
     jinterajin :str = "-"
     jintermalas:str ="-"
