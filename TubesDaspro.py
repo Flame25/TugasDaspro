@@ -568,6 +568,8 @@ def Help():
         print("   Untuk memanggil jin")
         print("3. hilangkanjin")
         print("   Untuk menghapus\menghilangkan jin")
+        print("4. laporanjin")
+        print("   Untuk melihat laporan mengenai jin yang ada")
     elif(userName == "Roro") : 
         print("1. logout")
         print("   Untuk keluar dari akun yang digunakan sekarang")
