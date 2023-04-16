@@ -178,6 +178,8 @@ def switch(userCommand):
         Help()
     elif(userCommand == "hancurkancandi"):
         hancurkanCandi()
+    elif(userCommand == "laporanjin"):
+        laporanJin()
 
 def logIn(): 
     print("Silahkan masukkan username Anda")
@@ -337,9 +339,10 @@ def hapusJin():
             return 0
     arrayNew = [["" for i in range(3)] for i in range(panjangFile("user.csv") -1)]
     x = 0
-    for i in range(panjangFile("user.csv")):
+    for i in range(panjangFile("user.csv")-1):
+        if(daftarCandi[i][0] == namaJin):
+            x+=1
         for j in range(3): 
-            if(userFile[i][0] != namaJin):
                 arrayNew[i][j] = userFile[x][j]
         x+=1
     writeFile("user.csv", arrayNew, panjangFile("user.csv")-1 ,3)
@@ -439,6 +442,56 @@ def Bangun():
     else  : 
         print("Bahan bangunan tidak mencukupi")
         print("Candi tidak bisa dibangun!")
+
+def jinTerajin():
+    minTemp = userFile[3][0]
+    for i  in range(3, panjangFile("user.csv")):
+        for j in range(min(length(userFile[i][0]), length(minTemp))): 
+            if(userFile[i][0][j] > minTemp[j]) :
+                break
+            if(userFile[i][0][j] < minTemp[j]): 
+                minTemp = userFile[i][0]
+
+    return minTemp
+
+def jinTermalas():
+    maxTemp = userFile[3][0]
+    for i  in range(3, panjangFile("user.csv")):
+          for j in range(min(length(userFile[i][0]), length(maxTemp))): 
+            if(userFile[i][0][j] < maxTemp[j]): 
+                  break
+            if(userFile[i][0][j] > maxTemp[j]): 
+                  maxTemp = userFile[i][0]
+    return maxTemp
+            
+
+def jumlahJin(tipeJin : str): 
+    cnt = 0  
+    for i in range(panjangFile("user.csv")): 
+        if(userFile[i][2] == tipeJin): 
+            cnt+=1
+    return cnt
+
+def laporanJin(): 
+    if(userName !=  ""):
+        return 0
+    jinterajin :str = "-"
+    jintermalas:str ="-"
+    totalJinPengumpul : int = jumlahJin("Pengumpul") 
+    totalJinPembangun  : int =  jumlahJin("Pembangun")
+    totalJin =  totalJinPembangun + totalJinPengumpul
+    if(panjangFile("user.csv") > 3 ): 
+        jinterajin = jinTerajin()
+        jintermalas = jinTermalas()
+    print("> Total jin : " + str(totalJin))
+    print("> Total jin Pengumpul : " + str(totalJinPengumpul))
+    print("> Total jin Pembangun : " + str(totalJinPembangun))
+    print("> Jin Terajin: "  + jinterajin)
+    print("> Jin Termalas: " + jintermalas)
+    print("> Jumlah Pasir: " + str(totalPasir) +  " unit")
+    print("> Jumlah Air: " + str(totalAir) +  " unit" ) 
+    print("> Jumlah Batu: " + str(totalBatu) +  " unit")    
+
 def Exit(): 
     panjangFileUser = panjangFile("user.csv")
     panjangFileBahan = panjangFile("bahan_bangunan.csv")
