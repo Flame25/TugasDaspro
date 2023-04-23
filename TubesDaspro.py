@@ -96,7 +96,7 @@ def removeEndspace (x):
 def hapusCandiCSV(indikatorHapus:str, jumlahHapus:int): 
     arrayNew = [["" for i in range(5)] for i in range(panjangFile("candi.csv") -jumlahHapus)]
     x = 0
-    for i in range(panjangFile("candi.csv") jumlahHapus ):
+    for i in range(panjangFile("candi.csv") - jumlahHapus ):
         if(daftarCandi[i][0] == indikatorHapus):
             x+=1
         for j in range(5): 
