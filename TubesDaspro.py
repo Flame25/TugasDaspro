@@ -16,7 +16,7 @@ totalBatu : int = 0
 totalPasir : int = 0
 totalAir : int = 0
 
-#Kumpulan Fungsi 
+#Kumpulan Fungsi Umum
 
 def panjangFile(namaFile): 
     f = open(namaFile, "r")
@@ -92,18 +92,74 @@ def removeEndspace (x):
         else :
             temp += x[i]
     return temp
-            
+
+def hapusCandiCSV(indikatorHapus:str, jumlahHapus:int): 
+    arrayNew = [["" for i in range(5)] for i in range(panjangFile("candi.csv") -jumlahHapus)]
+    x = 0
+    for i in range(panjangFile("candi.csv") jumlahHapus ):
+        if(daftarCandi[i][0] == indikatorHapus):
+            x+=1
+        for j in range(5): 
+                arrayNew[i][j] = daftarCandi[x][j]
+        else : x += 1
+    return arrayNew
+
+def hapusJinCSV(namaJin:str): 
+    arrayNew = [["" for i in range(3)] for i in range(panjangFile("user.csv") -1)]
+    x = 0
+    for i in range(panjangFile("user.csv")-1):
+        if(daftarCandi[i][0] == namaJin):
+            x+=1
+        for j in range(3): 
+                arrayNew[i][j] = userFile[x][j]
+        x+=1
+    return arrayNew
+
+def writeFile(namaFile,array,n , m): 
+    f = open(namaFile, "w")
+    for i in range(n): 
+        for j in range(m): 
+            if(j == m-1): 
+                f.write(array[i][j])
+            else :
+                f.write(array[i][j]+";") 
+        f.write("\n")
+    f.close()
+
+def cekId(id:int): 
+    for i in range(panjangFile("candi.csv")): 
+        if(id == daftarCandi[i][0]): 
+            return True
+    return False
+
+def getTotal(index: int): 
+    jumlahCandi = panjangFile("candi.csv")
+    cnt = 0
+    for i in range(1, jumlahCandi) : 
+        cnt += int(daftarCandi[i][index]) 
+    return cnt
+
+#End of Fungsi Umum
+
+#Fungsi Khusus untuk Soal - Soal
 def memintaArgs() : #Prosedur untuk parent folder
     parser = argparse.ArgumentParser()
-    parser.add_argument("Parent_Folder",help="nama parent folder penyimpanan data untuk aplikasi",type=str)
+    parser.add_argument("Parent_Folder",help="nama parent folder penyimpanan data untuk aplikasi",type=str, nargs= "?")
     args  = parser.parse_args()
+    if not args.Parent_Folder : 
+        print("Tidak ada nama folder yang diberikan") 
+        sys.exit()
     path = args.Parent_Folder
     if os.path.exists(path) : 
         print("Folder exist...")
         os.chdir(path)
         print("Parent Folder located....")
-        
-def load(namaFile:str,n:int) :  #Prosedur load
+    else : 
+        print('Folder "%s" tidak ditemukan'%path)
+        sys.exit()
+
+#Kumpulan prosedur & fungsi Load       
+def load(namaFile:str,n:int)->list :  #Fungsi load utama -> Mengembalikkan array untuk diinisiasi ke variabel
     f = open(namaFile, 'r') 
     isiFile= f.readline()
     isiFile = str(isiFile)
@@ -117,22 +173,69 @@ def load(namaFile:str,n:int) :  #Prosedur load
         isiFile = f.readline()
     print(tmpArray)
     return tmpArray
-        
-def writeFile(namaFile,array,n , m): 
-    f = open(namaFile, "w")
-    for i in range(n): 
-        for j in range(m): 
-            if(j == m-1): 
-                f.write(array[i][j])
-            else :
-                f.write(array[i][j]+";") 
-        f.write("\n")
-    f.close()
 
-def printUser(): 
-    print(userFile)
+def loadBahanBangunan(): #Prosedur untuk me-load bahan bangunan
+    global totalBatu,totalAir,totalPasir, bahanBangunan
+    bahanBangunan = load("bahan_bangunan.csv",3) #Digunakan fungsi load utama 
+    if(panjangFile("bahan_bangunan.csv") > 1): 
+        totalPasir = int(bahanBangunan[1][2])
+        totalBatu = int(bahanBangunan[2][2])
+        totalAir = int(bahanBangunan[3][2])
+    print("Daftar bahan bangunan berhasil di-load")
 
-def logOut():
+def loadUserFile(): #Prosedur untuk me-load file user
+    global userFile 
+    userFile = load("user.csv",3)
+    print("Daftar user berhasil di-load")
+
+def loadDaftarCandi(): #Prosedur untuk me-load candi
+    global daftarCandi 
+    daftarCandi = load("candi.csv",5)
+    print("Daftar candi berhasil di-load")
+#End of Prosedur load
+
+def save(): #Prosedur save
+    panjangFileUser = panjangFile("user.csv")
+    panjangFileBahan = panjangFile("bahan_bangunan.csv")
+    panjangFIleCandi = panjangFile("candi.csv")
+    namaFolder = input("Masukklan nama folder : ")
+    print("Saving...")
+    if not os.path.exists("save"): 
+        os.mkdir("save")
+
+    namaFolder= "save/"+namaFolder
+    if os.path.exists(namaFolder): 
+        os.chdir(namaFolder)
+    else : 
+        print("Membuat folder " + namaFolder)
+        os.mkdir(namaFolder)
+        os.chdir(namaFolder)
+    writeFile("user.csv", userFile , panjangFileUser,3 )
+    writeFile("bahan_bangunan.csv",bahanBangunan, panjangFileBahan,3 )
+    writeFile("candi.csv", daftarCandi, panjangFIleCandi,5 )
+    os.chdir("../")   #Keluar dari folder save
+    os.chdir("../")   #Keluar dari folder parent save
+    print("Berhasil menyimpan data di folder " + namaFolder + " !")    
+
+def logIn(): #Prosedur login
+    print("Silahkan masukkan username Anda")
+    global userName , userPass
+    lengthArray = panjangFile("user.csv")
+    while True: 
+        userName = input(">>>> ")
+        if(cekUser(userName,userFile, lengthArray)) : 
+            print("Masukkan Password")
+            userPass = input(">>>> ")
+            if(cekPass(userPass,userFile,lengthArray)):     
+                print("Login Berhasil")
+                break
+            else: 
+                print("Password Salah")
+        else : 
+            print("User Tidak Ditemukan")
+        print("Masukkan Username Ulang")
+
+def logOut(): #Prosesur untuk logout
     global userPass,userName 
     if(userPass == "" and userName ==""): 
         print("Logout gagal!")
@@ -142,7 +245,7 @@ def logOut():
         userName = ""
         print("Logout berhasil")
 
-def switch(userCommand): 
+def switch(userCommand): #Fungsi switch untuk input command game
     if( userCommand == "logout"):
         logOut()
     elif(userCommand =="login"): 
@@ -158,8 +261,6 @@ def switch(userCommand):
         sedangBerjalan = False
     elif(userCommand == "summonjin"): 
         summonJin()
-    elif(userCommand == "cekuser"):
-        printUser()
     elif(userCommand == "hapusjin"):
         hapusJin()
     elif(userCommand == "save"): 
@@ -182,25 +283,8 @@ def switch(userCommand):
         laporanJin()
     elif(userCommand == "laporancandi"):
         laporanCandi()
-def logIn(): 
-    print("Silahkan masukkan username Anda")
-    global userName , userPass
-    lengthArray = panjangFile("user.csv")
-    while True: 
-        userName = input(">>>> ")
-        if(cekUser(userName,userFile, lengthArray)) : 
-            print("Masukkan Password")
-            userPass = input(">>>> ")
-            if(cekPass(userPass,userFile,lengthArray)):     
-                print("Login Berhasil")
-                break
-            else: 
-                print("Password Salah")
-        else : 
-            print("User Tidak Ditemukan")
-        print("Masukkan Username Ulang")
 
-def summonJin(): 
+def summonJin(): #Prosedur summon jin
     print("Jenis jin yang dapat dipanggil : ")
     print("(1) Pengumpul - Bertugas mengumpulkan bahan bangunan\n(2) Pembangun - Bertugas membangun candi")
     while True: 
@@ -237,55 +321,8 @@ def summonJin():
     writeFile("user.csv",arrayNew,panjangFile("user.csv")+1,3)
     loadUserFile()
 
-def loadBahanBangunan(): 
-    global totalBatu,totalAir,totalPasir, bahanBangunan
-    bahanBangunan = load("bahan_bangunan.csv",3)
-    if(panjangFile("bahan_bangunan.csv") > 1): 
-        totalPasir = int(bahanBangunan[1][2])
-        totalBatu = int(bahanBangunan[2][2])
-        totalAir = int(bahanBangunan[3][2])
-    print("Daftar bahan bangunan berhasil di-load")
-
-def loadUserFile():
-    global userFile 
-    userFile = load("user.csv",3)
-    print("Daftar user berhasil di-load")
-
-def loadDaftarCandi(): 
-    global daftarCandi 
-    daftarCandi = load("candi.csv",5)
-    print("Daftar candi berhasil di-load")
-
-def lcg(a : int , c: int, m: int ) -> int : # X = (a*x + c) mod m 
-    global seed 
-    hasilLCG = (a*seed + c) % m
-    seed = hasilLCG
-    return hasilLCG %6
-
-def save(): 
-    panjangFileUser = panjangFile("user.csv")
-    panjangFileBahan = panjangFile("bahan_bangunan.csv")
-    panjangFIleCandi = panjangFile("candi.csv")
-    namaFolder = input("Masukklan nama folder : ")
-    print("Saving...")
-    if not os.path.exists("save"): 
-        os.mkdir("save")
-
-    namaFolder= "save/"+namaFolder
-    if os.path.exists(namaFolder): 
-        os.chdir(namaFolder)
-    else : 
-        print("Membuat folder " + namaFolder)
-        os.mkdir(namaFolder)
-        os.chdir(namaFolder)
-    writeFile("user.csv", userFile , panjangFileUser,3 )
-    writeFile("bahan_bangunan.csv",bahanBangunan, panjangFileBahan,3 )
-    writeFile("candi.csv", daftarCandi, panjangFIleCandi,5 )
-    os.chdir("../")   #Keluar dari folder save
-    os.chdir("../")   #Keluar dari folder parent save
-    print("Berhasil menyimpan data di folder " + namaFolder + " !")    
-
-def getJin(userName): 
+#Fungsi dan Prosedur Ubah Tipe Jin 
+def getJin(userName): #Fungsi berguna untuk mengambil array yang hanya berisi jin dengan username spesifik
     arrayJin = ["" for i in range(3)]
     for i in range(panjangFile("user.csv")): 
         for j in range(3): 
@@ -293,7 +330,7 @@ def getJin(userName):
                 arrayJin = [i]
     return arrayJin
  
-def ubahTipeJin():
+def ubahTipeJin(): #Fungsi utama ubah tipe jin
     while True  : 
         userNameJin = input("Masukkan username jin : ")
         if( cekUser(userNameJin)) : 
@@ -324,8 +361,17 @@ def ubahTipeJin():
     print("Tipe jin berhasil diubah")
     loadUserFile()
     return 0 
+#End of Fungsi dan Prosedur Ubah Tipe Jin 
+
+#Prosedur dan Fungsi Hitung Candi 
+def hitungCandi(namaJin:str)->int: #Fungsi untuk menghitung beraepa banyak jumlah candi yang ada dengan nama jin spesifik
+    cnt = 0 
+    for i in range(panjangFile("candi.csv")): 
+        if(daftarCandi[i][1] == namaJin):
+            cnt+=1
+    return cnt
     
-def hapusJin(): 
+def hapusJin(): #Fungsi utama hapus candi
     while True : 
         namaJin = input("Masukkan username jin : ")
         if( cekUser(namaJin,userFile,panjangFile("user.csv"))) : 
@@ -338,19 +384,16 @@ def hapusJin():
             break
         else : 
             return 0
-    arrayNew = [["" for i in range(3)] for i in range(panjangFile("user.csv") -1)]
-    x = 0
-    for i in range(panjangFile("user.csv")-1):
-        if(daftarCandi[i][0] == namaJin):
-            x+=1
-        for j in range(3): 
-                arrayNew[i][j] = userFile[x][j]
-        x+=1
+    jumlahCandi = hitungCandi(namaJin)
+    if jumlahCandi > 0 : 
+        hapusCandiCSV(namaJin,jumlahCandi)
+    arrayNew = hapusJinCSV(namaJin)
     writeFile("user.csv", arrayNew, panjangFile("user.csv")-1 ,3)
     print("Jin "+ namaJin + " berhasil dihapus.")
     loadUserFile()
+#End of Hitung Candi
     
-def ayamBerkokok(): 
+def ayamBerkokok(): #Prosedur untuk Ayam Berkokok
     print("Kukuruyuk.. Kukuruyuk..\n")
     print("Jumlah candi : " + str(panjangFile("candi.csv") -1) +"\n")
     if(panjangFile("candi.csv") -1 == 100): 
@@ -361,7 +404,15 @@ def ayamBerkokok():
         print("\n")
         print("*Bandung Bondowoso angry noise* \nRoro Jonggrang dikutuk menjadi candi.")
 
-def Kumpul(): 
+#Fungsi dan Prosedur untuk Kumpul
+def lcg(a : int , c: int, m: int ) -> int : #Fungsi untuk Random Number Generator (digunakan lcg)
+    # X = (a*x + c) mod m 
+    global seed 
+    hasilLCG = (a*seed + c) % m
+    seed = hasilLCG
+    return hasilLCG %6
+
+def Kumpul(): #Fungsi utama untuk kumpul
     global totalBatu, totalPasir, totalAir, bahanBangunan
     nPasir = lcg(151811,3112,50603)
     nBatu =lcg(151813,3112,50603)
@@ -381,13 +432,11 @@ def Kumpul():
         bahanBangunan[3][2] = str(totalAir)
         writeFile("bahan_bangunan.csv", bahanBangunan, panjangFile("bahan_bangunan.csv"),3)
     loadBahanBangunan()
-def cekId(id:int): 
-    for i in range(panjangFile("candi.csv")): 
-        if(id == daftarCandi[i][0]): 
-            return True
-    return False
+#End of Kumpul
 
-def hancurkanCandi(): 
+
+
+def hancurkanCandi(): #Prosedur untuk Hancurkan Candi
     while True : 
         idCandi = input("Masukkan id candi: ")
         if(cekId(idCandi)) : 
@@ -400,15 +449,7 @@ def hancurkanCandi():
             break; 
         else: 
             return 0
-    arrayNew = [["" for i in range(5)] for i in range(panjangFile("candi.csv") -1)]
-    x = 0
-    for i in range(panjangFile("candi.csv") -1 ):
-        if(daftarCandi[i][0] == idCandi):
-            x+=1
-        for j in range(5): 
-                arrayNew[i][j] = daftarCandi[x][j]
-        else : x += 1
-    print(arrayNew)
+    arrayNew = hapusCandiCSV(idCandi,1)
     writeFile("candi.csv", arrayNew, panjangFile("candi.csv")-1 ,5)
     print("Candi dengan id " + idCandi + " berhasil dihapus")
     loadDaftarCandi()
@@ -444,23 +485,7 @@ def Bangun():
         print("Bahan bangunan tidak mencukupi")
         print("Candi tidak bisa dibangun!")
 
-def jinTerajin():
-    minTemp = userFile[3][0]
-    for i  in range(3, panjangFile("user.csv")):
-        for j in range(min(length(userFile[i][0]), length(minTemp))): 
-            if(userFile[i][0][j] > minTemp[j]) :
-                break
-            if(userFile[i][0][j] < minTemp[j]): 
-                minTemp = userFile[i][0]
-
-    return minTemp
-
-def getTotal(index: int): 
-    jumlahCandi = panjangFile("candi.csv")
-    cnt = 0
-    for i in range(1, jumlahCandi) : 
-        cnt += int(daftarCandi[i][index]) 
-    return cnt
+#Start of Laporan Candi
 def hitungHarga(id:str): 
     for i in range(panjangFile("candi.csv")):
         if(daftarCandi[i][0] == id ): 
@@ -480,7 +505,7 @@ def candiTermurah():
     return idCandi
 
 def laporanCandi(): 
-    if(userName != "Bondowso"): 
+    if(userName != "Bondowoso"): 
         print("Laporan candi hanya dapat diakses oleh akun Bandung Bondowoso.")
         return 0
     
@@ -499,7 +524,9 @@ def laporanCandi():
     else: 
         print("> Id Candi termahal :  -")
         print("> id Candi termurah :  -")
-    
+#End of Laporan Candi
+
+#Start of Laporan Jin
 def jinTermalas():
     maxTemp = userFile[3][0]
     for i  in range(3, panjangFile("user.csv")):
@@ -509,7 +536,17 @@ def jinTermalas():
             if(userFile[i][0][j] > maxTemp[j]): 
                   maxTemp = userFile[i][0]
     return maxTemp
-            
+
+def jinTerajin():
+    minTemp = userFile[3][0]
+    for i  in range(3, panjangFile("user.csv")):
+        for j in range(min(length(userFile[i][0]), length(minTemp))): 
+            if(userFile[i][0][j] > minTemp[j]) :
+                break
+            if(userFile[i][0][j] < minTemp[j]): 
+                minTemp = userFile[i][0]
+
+    return minTemp
 
 def jumlahJin(tipeJin : str): 
     cnt = 0  
@@ -538,8 +575,9 @@ def laporanJin():
     print("> Jumlah Pasir: " + str(totalPasir) +  " unit")
     print("> Jumlah Air: " + str(totalAir) +  " unit" ) 
     print("> Jumlah Batu: " + str(totalBatu) +  " unit")    
+#End of Laporan Jin
 
-def Exit(): 
+def Exit(): #Prosedur untuk Exit
     panjangFileUser = panjangFile("user.csv")
     panjangFileBahan = panjangFile("bahan_bangunan.csv")
     panjangFIleCandi = panjangFile("candi.csv")
@@ -552,9 +590,9 @@ def Exit():
             break
         elif(konfirmasiUser == "n" or konfirmasiUser =="N") : 
             break
-
     sys.exit()
-def Help(): 
+
+def Help(): #Prosedur untuk Help
     print("=========== HELP ===========")
     if(userName == "" and userPass == ""): 
         print("1. Login")
@@ -566,7 +604,7 @@ def Help():
         print("   Untuk keluar dari akun yang digunakan sekarang")
         print("2. summonjin")
         print("   Untuk memanggil jin")
-        print("3. hilangkanjin")
+        print("3. hapusjin")
         print("   Untuk menghapus\menghilangkan jin")
         print("4. laporanjin")
         print("   Untuk melihat laporan mengenai jin yang ada")
