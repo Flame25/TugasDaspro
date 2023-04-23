@@ -608,6 +608,8 @@ def Help(): #Prosedur untuk Help
         print("   Untuk menghapus\menghilangkan jin")
         print("4. laporanjin")
         print("   Untuk melihat laporan mengenai jin yang ada")
+        print("5. laporancandi")
+        print("   Untuk melihat laporan mengenai candi yang sudah dibangun")
     elif(userName == "Roro") : 
         print("1. logout")
         print("   Untuk keluar dari akun yang digunakan sekarang")
