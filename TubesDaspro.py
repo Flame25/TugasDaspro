@@ -27,25 +27,33 @@ def panjangFile(namaFile):
         i+=1 
     return i-1
 
-def length(nString:str): 
-    nMark : chr = '.'
-    nString+= nMark
-    i = 0
-    while(nString[i] != nMark): 
-        i+=1
-    return i 
+def tipeUser(userNameUser:str)-> str :
+    for i in range(1,panjangFile("user.csv")): 
+        if(userFile[i][0] == userNameUser):
+            return userFile[i][2] 
+        
+def length(nString, i:int =0, nMark:chr ='.'): #REKURSIF
+    if i >= len(nString) or nString[i] == nMark:
+        return i
+    else:
+        return length(nString, i + 1, nMark)
 
-def cekPass(PassUser, arrayUser,n): 
-    for i in range(n): 
-        if( arrayUser[i][1] == PassUser): 
-            return True
-    return False
+def cekPass(PassUser, arrayUser, n, i=1):  #REKURSIF
+    if i >= n:
+        return False
+    elif arrayUser[i][1] == PassUser:
+        return True
+    else:
+        return cekPass(PassUser, arrayUser, n, i + 1)
 
-def cekUser(nameUser, arrayUser,n): 
-    for i in range(n): 
-        if( arrayUser[i][0] == nameUser): 
-            return True
-    return False
+def cekUser(nameUser, arrayUser, n, i=1): #REKURSIF
+    if i >= n:
+        return False
+    elif arrayUser[i][0] == nameUser:
+        return True
+    else:
+        return cekUser(nameUser, arrayUser, n, i + 1)
+    
 def initializeArray (array : list, n :int, m:int, array2:list , n2:int) : 
     newArray = [["" for i in range(m)] for i in range(n+n2)]
     for i in range(n):
@@ -84,14 +92,11 @@ def splitArr(nString:str,n:int): #Split dilakukan dengan asumsi ";" sebagai pemi
     tmpArray[indexArray]=tmpStr
     return tmpArray
 
-def removeEndspace (x): 
-    temp = ""
-    for i in range(length(x)): 
-        if(x[i] == "\n" ) : 
-            break ; 
-        else :
-            temp += x[i]
-    return temp
+def removeEndspace(x, i=0, temp=""): #REKURSIF
+    if i >= length(x) or x[i] == "\n":
+        return temp
+    else:
+        return removeEndspace(x, i + 1, temp + x[i])
 
 def hapusCandiCSV(indikatorHapus:str, jumlahHapus:int): 
     arrayNew = [["" for i in range(5)] for i in range(panjangFile("candi.csv") -jumlahHapus)]
@@ -200,10 +205,12 @@ def save(): #Prosedur save
     panjangFIleCandi = panjangFile("candi.csv")
     namaFolder = input("Masukklan nama folder : ")
     print("Saving...")
-    if not os.path.exists("save"): 
-        os.mkdir("save")
+    os.chdir("../")   #Keluar dari folder save
+    # if not os.path.exists("save"): 
+    #     os.mkdir("save")
+    #     os.chdir("save")
 
-    namaFolder= "save/"+namaFolder
+    namaFolder= namaFolder
     if os.path.exists(namaFolder): 
         os.chdir(namaFolder)
     else : 
@@ -213,8 +220,6 @@ def save(): #Prosedur save
     writeFile("user.csv", userFile , panjangFileUser,3 )
     writeFile("bahan_bangunan.csv",bahanBangunan, panjangFileBahan,3 )
     writeFile("candi.csv", daftarCandi, panjangFIleCandi,5 )
-    os.chdir("../")   #Keluar dari folder save
-    os.chdir("../")   #Keluar dari folder parent save
     print("Berhasil menyimpan data di folder " + namaFolder + " !")    
 
 def logIn(): #Prosedur login
@@ -244,45 +249,60 @@ def logOut(): #Prosesur untuk logout
         userPass = ""
         userName = ""
         print("Logout berhasil")
-
+        
+# ===============================================================
+# Fungsi Switch Utama untuk Menerima Command
+# ===============================================================
 def switch(userCommand): #Fungsi switch untuk input command game
+
+# Fungsi yang bisa diakses semua user
     if( userCommand == "logout"):
         logOut()
     elif(userCommand =="login"): 
-        logIn()
+        logIn()    
     elif(userCommand == "load"): 
         global userFile, daftarCandi, bahanBangunan 
         userFile = load("user.csv",3)
         daftarCandi = load("candi.csv",5)
         bahanBangunan = load("bahan_bangunan.csv",3)
         if(panjangFile("bahan_bangunan.csv")>1): loadBahanBangunan()
-    elif(userCommand == "break"): 
-        global sedangBerjalan 
-        sedangBerjalan = False
-    elif(userCommand == "summonjin"): 
-        summonJin()
-    elif(userCommand == "hapusjin"):
-        hapusJin()
     elif(userCommand == "save"): 
         save()
-    elif(userCommand == "ubahjin"): 
-        ubahTipeJin()
-    elif(userCommand == "ayamberkokok"): 
-        ayamBerkokok()
-    elif(userCommand == "kumpul"): 
-        Kumpul()
-    elif(userCommand == "bangun"): 
-        Bangun()
     elif(userCommand == "exit"): 
         Exit()
     elif(userCommand == "help"): 
         Help()
+# ----------------------------------------------------------------
+
+# Fungsi yang bisa diakses Bondowoso
+    if(userName == "Bondowoso"): 
+        if(userCommand == "summonjin"): 
+            summonJin()
+        elif(userCommand == "hapusjin"):
+            hapusJin()
+        elif(userCommand == "ubahjin"): 
+            ubahTipeJin()
+        elif(userCommand == "laporanjin"):
+            laporanJin()
+        elif(userCommand == "laporancandi"):
+            laporanCandi()
+# ----------------------------------------------------------------
+
+#Fungsi yang bisa diakses jin Pembangun atau Pengumpul
+    elif(tipeUser(userName) == "Pengumpul"):
+        if(userCommand == "kumpul"): 
+            Kumpul()
+    elif(tipeUser(userName) == "Pembangun"):
+        if(userCommand == "bangun"): 
+            Bangun()
+# ---------------------------------------------------------------- 
+
+# Fungsi yang bisa diakses Roro Jonggrang
+    elif(userCommand == "ayamberkokok"): 
+        ayamBerkokok()
     elif(userCommand == "hancurkancandi"):
         hancurkanCandi()
-    elif(userCommand == "laporanjin"):
-        laporanJin()
-    elif(userCommand == "laporancandi"):
-        laporanCandi()
+# ---------------------------------------------------------------- 
 
 def summonJin(): #Prosedur summon jin
     print("Jenis jin yang dapat dipanggil : ")
@@ -302,7 +322,7 @@ def summonJin(): #Prosedur summon jin
     while True: 
         namaJin = input("Masukkan username jin : ")
         if(cekUser(namaJin, userFile,panjangFile("user.csv"))) : 
-            print('Username "Genie" sudah diambil! ')
+            print('Username "' + namaJin + '" sudah diambil!')
         else: 
             print("Pendaftaran Username berhasil")
             break
@@ -376,6 +396,10 @@ def hapusJin(): #Fungsi utama hapus candi
         namaJin = input("Masukkan username jin : ")
         if( cekUser(namaJin,userFile,panjangFile("user.csv"))) : 
             break 
+        elif(namaJin == "Bondowoso"): 
+            print("Tidak bisa menghapus Bandung Bondowoso")
+        elif(namaJin == "Roro") : 
+            print("Tidak bisa menghapus Roro Jonggrang")
         else : 
             print("Tidak ada jin dengan username tersebut.")
     while True :
