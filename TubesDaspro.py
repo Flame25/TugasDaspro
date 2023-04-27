@@ -1,8 +1,6 @@
 import os 
-import csv
 import argparse 
 import sys
-import typing
 
 #Deklarasi Global Variabel
 userName : str  = ""
@@ -16,8 +14,9 @@ totalBatu : int = 0
 totalPasir : int = 0
 totalAir : int = 0
 
-#Kumpulan Fungsi Umum
-
+# ===============================================================
+# Kumpulan Fungsi Umum
+# ===============================================================
 def panjangFile(namaFile): 
     f = open(namaFile, "r")
     i = 0
@@ -26,18 +25,18 @@ def panjangFile(namaFile):
         t = f.readline()
         i+=1 
     return i-1
-
+# ---------------------------------------------------------------- 
 def tipeUser(userNameUser:str)-> str :
     for i in range(1,panjangFile("user.csv")): 
         if(userFile[i][0] == userNameUser):
             return userFile[i][2] 
-        
+# ----------------------------------------------------------------        
 def length(nString, i:int =0, nMark:chr ='.'): #REKURSIF
     if i >= len(nString) or nString[i] == nMark:
         return i
     else:
         return length(nString, i + 1, nMark)
-
+# ---------------------------------------------------------------- 
 def cekPass(PassUser, arrayUser, n, i=1):  #REKURSIF
     if i >= n:
         return False
@@ -45,7 +44,7 @@ def cekPass(PassUser, arrayUser, n, i=1):  #REKURSIF
         return True
     else:
         return cekPass(PassUser, arrayUser, n, i + 1)
-
+# ---------------------------------------------------------------- 
 def cekUser(nameUser, arrayUser, n, i=1): #REKURSIF
     if i >= n:
         return False
@@ -53,7 +52,7 @@ def cekUser(nameUser, arrayUser, n, i=1): #REKURSIF
         return True
     else:
         return cekUser(nameUser, arrayUser, n, i + 1)
-    
+ # ----------------------------------------------------------------    
 def initializeArray (array : list, n :int, m:int, array2:list , n2:int) : 
     newArray = [["" for i in range(m)] for i in range(n+n2)]
     for i in range(n):
@@ -63,8 +62,8 @@ def initializeArray (array : list, n :int, m:int, array2:list , n2:int) :
     for i in range(n2): 
         for j in range(m): 
             newArray[i + n][j] = array2[j]
-
     return newArray
+# ---------------------------------------------------------------- 
 def initializeArray2 (array : list, n :int, m:int, array2:list , n2:int) : 
     newArray = [["" for i in range(m)] for i in range(n+n2)]
     for i in range(n): 
@@ -74,9 +73,8 @@ def initializeArray2 (array : list, n :int, m:int, array2:list , n2:int) :
     for i in range(n2): 
         for j in range(m): 
             newArray[i + n][j] = array2[i][j]
-
     return newArray           
-        
+# ----------------------------------------------------------------         
 def splitArr(nString:str,n:int): #Split dilakukan dengan asumsi ";" sebagai pemisah
     tmpArray = ["" for i in range(n)]
     tmpStr = ""
@@ -91,35 +89,36 @@ def splitArr(nString:str,n:int): #Split dilakukan dengan asumsi ";" sebagai pemi
     tmpStr = removeEndspace(tmpStr)
     tmpArray[indexArray]=tmpStr
     return tmpArray
-
+# ---------------------------------------------------------------- 
 def removeEndspace(x, i=0, temp=""): #REKURSIF
     if i >= length(x) or x[i] == "\n":
         return temp
     else:
         return removeEndspace(x, i + 1, temp + x[i])
-
-def hapusCandiCSV(indikatorHapus:str, jumlahHapus:int): 
+# ---------------------------------------------------------------- 
+def hapusCandiCSV(indikatorHapus:str, jumlahHapus:int, indexIndikator:int): 
     arrayNew = [["" for i in range(5)] for i in range(panjangFile("candi.csv") -jumlahHapus)]
     x = 0
-    for i in range(panjangFile("candi.csv") - jumlahHapus ):
-        if(daftarCandi[i][0] == indikatorHapus):
-            x+=1
-        for j in range(5): 
-                arrayNew[i][j] = daftarCandi[x][j]
-        else : x += 1
+    cnt = 0
+    for i in range(panjangFile("candi.csv")):
+        if(daftarCandi[i][indexIndikator] != indikatorHapus):
+            for j in range(5): 
+                arrayNew[cnt][j] = daftarCandi[x][j]
+            cnt+=1
+        x += 1
     return arrayNew
-
+# ---------------------------------------------------------------- 
 def hapusJinCSV(namaJin:str): 
     arrayNew = [["" for i in range(3)] for i in range(panjangFile("user.csv") -1)]
     x = 0
     for i in range(panjangFile("user.csv")-1):
-        if(daftarCandi[i][0] == namaJin):
+        if(userFile[i][0] == namaJin):
             x+=1
         for j in range(3): 
                 arrayNew[i][j] = userFile[x][j]
         x+=1
     return arrayNew
-
+# ---------------------------------------------------------------- 
 def writeFile(namaFile,array,n , m): 
     f = open(namaFile, "w")
     for i in range(n): 
@@ -130,21 +129,20 @@ def writeFile(namaFile,array,n , m):
                 f.write(array[i][j]+";") 
         f.write("\n")
     f.close()
-
+# ---------------------------------------------------------------- 
 def cekId(id:int): 
     for i in range(panjangFile("candi.csv")): 
         if(id == daftarCandi[i][0]): 
             return True
     return False
-
+# ---------------------------------------------------------------- 
 def getTotal(index: int): 
     jumlahCandi = panjangFile("candi.csv")
     cnt = 0
     for i in range(1, jumlahCandi) : 
         cnt += int(daftarCandi[i][index]) 
     return cnt
-
-#End of Fungsi Umum
+# ---------------------------------------------------------------- 
 
 #Fungsi Khusus untuk Soal - Soal
 def memintaArgs() : #Prosedur untuk parent folder
@@ -205,11 +203,6 @@ def save(): #Prosedur save
     panjangFIleCandi = panjangFile("candi.csv")
     namaFolder = input("Masukklan nama folder : ")
     print("Saving...")
-    os.chdir("../")   #Keluar dari folder save
-    # if not os.path.exists("save"): 
-    #     os.mkdir("save")
-    #     os.chdir("save")
-
     namaFolder= namaFolder
     if os.path.exists(namaFolder): 
         os.chdir(namaFolder)
@@ -222,6 +215,9 @@ def save(): #Prosedur save
     writeFile("candi.csv", daftarCandi, panjangFIleCandi,5 )
     print("Berhasil menyimpan data di folder " + namaFolder + " !")    
 
+# ===============================================================
+# Bagian Login dan Logout
+# ===============================================================
 def logIn(): #Prosedur login
     print("Silahkan masukkan username Anda")
     global userName , userPass
@@ -239,7 +235,7 @@ def logIn(): #Prosedur login
         else : 
             print("User Tidak Ditemukan")
         print("Masukkan Username Ulang")
-
+# ----------------------------------------------------------------  
 def logOut(): #Prosesur untuk logout
     global userPass,userName 
     if(userPass == "" and userName ==""): 
@@ -249,7 +245,99 @@ def logOut(): #Prosesur untuk logout
         userPass = ""
         userName = ""
         print("Logout berhasil")
-        
+# ----------------------------------------------------------------  
+
+
+# ===============================================================
+# Bagian untuk Batch Kumpul
+# ===============================================================
+
+# Prosedur menggunakan prosedur untuk bagian Kumpul (Line: ....)
+def batchkumpul(): 
+    totalJinPengumpul : int = jumlahJin("Pengumpul") 
+    if(totalJinPengumpul == 0 ): 
+        print("Kumpul gagal. Anda tidak punya jin pengumpul. Silahkan summon terlebih dahulu.")
+    else : 
+        print("Mengerahkan %d jin untuk mengumpulkan bahan"%totalJinPengumpul)
+        Kumpul(totalJinPengumpul)
+# ----------------------------------------------------------------
+
+
+# ===============================================================
+# Bagian untuk Batch Bangun
+# ===============================================================
+
+# Prosedur batch bangun utama
+def batchbangun(): 
+    totalJinPembangun  : int =  jumlahJin("Pembangun")
+    jumlahCandi = panjangFile("candi.csv")-1
+    print("Sudah terdapat %d candi"%jumlahCandi)
+
+    if(totalJinPembangun + jumlahCandi > 100) : 
+        print("Mengerahkan %d jin untuk membangun candi"%(100 - jumlahCandi))
+        bangunBanyak(jumlahJin-jumlahCandi)
+    else : 
+        print("Mengerahkan %d jin untuk membangun candi"%totalJinPembangun)
+        bangunBanyak(totalJinPembangun)
+# ----------------------------------------------------------------
+
+#Prosedur membangun candi setiap jin dan dimasukkan ke csv
+def bangunBanyak(jumlahJin :int ): 
+    global totalPasir, totalBatu, totalAir, daftarCandi, bahanBangunan
+    jumlahPasir = 0 
+    jumlahBatu = 0
+    jumlahAir = 0
+    nPasir = [0 for i in range (jumlahJin)]
+    nBatu =[0 for i in range (jumlahJin)]
+    nAir = [0 for i in range (jumlahJin)]
+    arrayJin = getJinPembangun()
+    for i in range(jumlahJin): 
+        nPasir[i] =lcg(151873,3112,50603)
+        nBatu[i] =lcg(151879,3112,50603)
+        nAir[i] = lcg(151837,3112,50603)
+        jumlahPasir += nPasir[i]
+        jumlahAir += nAir[i]
+        jumlahBatu += nBatu[i]
+    print("Bahan yang diperlukan : " + str(jumlahPasir) + " pasir, " + str(jumlahBatu) + " batu, " + str(jumlahAir) +" air")
+    if(jumlahPasir > totalPasir or jumlahAir > totalAir or jumlahBatu > totalBatu): 
+        print("Bangun gagal. Kurang %d pasir, %d batu, dan %d air."%(jumlahPasir-totalPasir),(jumlahBatu-totalBatu),(jumlahAir-totalAir))
+        return 0
+    else : 
+        totalPasir -= jumlahPasir
+        totalAir -= jumlahAir
+        totalBatu -= jumlahBatu
+        print("Jin berhasil membangun %d candi"%jumlahJin)
+        for j in range(jumlahJin): 
+            idCandi = 0
+            for i in range(1,panjangFile("candi.csv")): 
+                if(i == panjangFile("candi.csv") -1  or i != int(daftarCandi[i][0]) ): 
+                    idCandi = i
+            arrayTemp = [str(idCandi), arrayJin[j][0], str(nPasir[j]), str(nBatu[j]),str(nAir[j])]
+            if(panjangFile("candi.csv") -1 < 100): 
+                arrayNew = initializeArray(daftarCandi, panjangFile("candi.csv"),5, arrayTemp,1)
+                writeFile("candi.csv", arrayNew, panjangFile("candi.csv") + 1, 5)
+                bahanBangunan[1][2] = str(totalPasir)
+                bahanBangunan[2][2] = str(totalBatu)
+                bahanBangunan[3][2] = str(totalAir)
+                writeFile("bahan_bangunan.csv", bahanBangunan, panjangFile("bahan_bangunan.csv"), 3)
+                loadBahanBangunan()
+                loadDaftarCandi()
+# ----------------------------------------------------------------  
+
+# Fungsi mengembalikan array yang berisi hanya jin pembangun
+def getJinPembangun() -> list: 
+    jumlahJinPembangun = jumlahJin("Pembangun")
+    sebuahArray = [["" for i in range(3)] for i in range(jumlahJinPembangun)] 
+    x = 0
+    for i in range(panjangFile("user.csv")): 
+        if(userFile[i][2] == "Pembangun"): 
+            for j in range(3): 
+                print(i,j)
+                sebuahArray[x][j] = userFile[i][j]
+            x+=1
+    return sebuahArray
+# ---------------------------------------------------------------- 
+
 # ===============================================================
 # Fungsi Switch Utama untuk Menerima Command
 # ===============================================================
@@ -265,7 +353,8 @@ def switch(userCommand): #Fungsi switch untuk input command game
         userFile = load("user.csv",3)
         daftarCandi = load("candi.csv",5)
         bahanBangunan = load("bahan_bangunan.csv",3)
-        if(panjangFile("bahan_bangunan.csv")>1): loadBahanBangunan()
+        if(panjangFile("bahan_bangunan.csv")>1):
+            loadBahanBangunan()
     elif(userCommand == "save"): 
         save()
     elif(userCommand == "exit"): 
@@ -286,12 +375,16 @@ def switch(userCommand): #Fungsi switch untuk input command game
             laporanJin()
         elif(userCommand == "laporancandi"):
             laporanCandi()
+        elif(userCommand == "batchbangun"): 
+            batchbangun()
+        elif(userCommand == "batchkumpul"):
+            batchkumpul()
 # ----------------------------------------------------------------
 
 #Fungsi yang bisa diakses jin Pembangun atau Pengumpul
     elif(tipeUser(userName) == "Pengumpul"):
         if(userCommand == "kumpul"): 
-            Kumpul()
+            Kumpul(1)
     elif(tipeUser(userName) == "Pembangun"):
         if(userCommand == "bangun"): 
             Bangun()
@@ -305,6 +398,9 @@ def switch(userCommand): #Fungsi switch untuk input command game
 # ---------------------------------------------------------------- 
 
 def summonJin(): #Prosedur summon jin
+    if(panjangFile("user.csv") -3 == 100): 
+        print("Jumlah Jin telah maksimal! (100 jin). Bandung tidak dapat men-summon lebih dari itu.")
+        return 0
     print("Jenis jin yang dapat dipanggil : ")
     print("(1) Pengumpul - Bertugas mengumpulkan bahan bangunan\n(2) Pembangun - Bertugas membangun candi")
     while True: 
@@ -410,7 +506,9 @@ def hapusJin(): #Fungsi utama hapus candi
             return 0
     jumlahCandi = hitungCandi(namaJin)
     if jumlahCandi > 0 : 
-        hapusCandiCSV(namaJin,jumlahCandi)
+       arrayCandiNew = hapusCandiCSV(namaJin,jumlahCandi,1)
+       print(jumlahCandi)
+       writeFile("candi.csv", arrayCandiNew, panjangFile("candi.csv")-jumlahCandi ,5)
     arrayNew = hapusJinCSV(namaJin)
     writeFile("user.csv", arrayNew, panjangFile("user.csv")-1 ,3)
     print("Jin "+ namaJin + " berhasil dihapus.")
@@ -436,15 +534,21 @@ def lcg(a : int , c: int, m: int ) -> int : #Fungsi untuk Random Number Generato
     seed = hasilLCG
     return hasilLCG %6
 
-def Kumpul(): #Fungsi utama untuk kumpul
+def Kumpul(jumlahJin:int): #Fungsi utama untuk kumpul
     global totalBatu, totalPasir, totalAir, bahanBangunan
-    nPasir = lcg(151811,3112,50603)
-    nBatu =lcg(151813,3112,50603)
-    nAir = lcg(1518019,3112,50605)   
+    nPasir =0
+    nBatu =0
+    nAir = 0 
+    
+    for i in range(jumlahJin): 
+        nPasir+=lcg(151811,3112,50603)
+        nBatu +=lcg(151813,3112,50603)
+        nAir  +=lcg(1518019,3112,50605)   
+    
     totalBatu += nBatu
     totalAir += nAir
     totalPasir += nPasir
-    print("Jin menemukan " + str(nPasir) + " pasir "  + str(nBatu) + " batu " + str(nAir) + " air")
+    print("Jin menemukan total " + str(nPasir) + " pasir "  + str(nBatu) + " batu " + str(nAir) + " air")
     arrayTemp = [["Pasir","sebuah pasir",str(nPasir)], ["Batu","sebuah batu", str(nBatu)], ["Air", "sebuah air", str(nAir)]]
     if(panjangFile("bahan_bangunan.csv") == 1): 
         print(bahanBangunan)
@@ -473,7 +577,7 @@ def hancurkanCandi(): #Prosedur untuk Hancurkan Candi
             break; 
         else: 
             return 0
-    arrayNew = hapusCandiCSV(idCandi,1)
+    arrayNew = hapusCandiCSV(idCandi,1,0)
     writeFile("candi.csv", arrayNew, panjangFile("candi.csv")-1 ,5)
     print("Candi dengan id " + idCandi + " berhasil dihapus")
     loadDaftarCandi()
@@ -505,6 +609,7 @@ def Bangun():
             writeFile("bahan_bangunan.csv", bahanBangunan, panjangFile("bahan_bangunan.csv"), 3)
             loadBahanBangunan()
             loadDaftarCandi()
+        
     else  : 
         print("Bahan bangunan tidak mencukupi")
         print("Candi tidak bisa dibangun!")
@@ -634,6 +739,10 @@ def Help(): #Prosedur untuk Help
         print("   Untuk melihat laporan mengenai jin yang ada")
         print("5. laporancandi")
         print("   Untuk melihat laporan mengenai candi yang sudah dibangun")
+        print("6. batchkumpul")
+        print("   ---")
+        print("7. batchbangun")
+        print("   ---")
     elif(userName == "Roro") : 
         print("1. logout")
         print("   Untuk keluar dari akun yang digunakan sekarang")
