@@ -17,6 +17,13 @@ totalAir : int = 0
 # ===============================================================
 # Kumpulan Fungsi Umum
 # ===============================================================
+def maximum(a:int,b:int)->int:
+    if(a>b):return a
+    else : return b 
+def minimum(a:int,b:int)->int:
+    if(a<b):return a
+    else : return b 
+
 def panjangFile(namaFile): 
     f = open(namaFile, "r")
     i = 0
@@ -614,7 +621,9 @@ def Bangun():
         print("Bahan bangunan tidak mencukupi")
         print("Candi tidak bisa dibangun!")
 
-#Start of Laporan Candi
+# ===============================================================
+# Bagian Laporan Candi
+# ===============================================================
 def hitungHarga(id:str): 
     for i in range(panjangFile("candi.csv")):
         if(daftarCandi[i][0] == id ): 
@@ -653,38 +662,72 @@ def laporanCandi():
     else: 
         print("> Id Candi termahal :  -")
         print("> id Candi termurah :  -")
-#End of Laporan Candi
+# ---------------------------------------------------------------- 
 
-#Start of Laporan Jin
-def jinTermalas():
-    maxTemp = userFile[3][0]
-    for i  in range(3, panjangFile("user.csv")):
-          for j in range(min(length(userFile[i][0]), length(maxTemp))): 
-            if(userFile[i][0][j] < maxTemp[j]): 
-                  break
-            if(userFile[i][0][j] > maxTemp[j]): 
-                  maxTemp = userFile[i][0]
-    return maxTemp
+# ===============================================================
+# Bagian Laporan Jin
+# ===============================================================
+def jinTermalas()-> str: # Mencari jin termalas
+    minCandi = 999
+    jinMalas= ""  
+    for i in range(3,panjangFile("user.csv")): 
+        if(userFile[i][2] == "Pembangun"): 
+            tmp = menghitungJumlahCandi(userFile[i][0])
+            if(minCandi > tmp):
+                minCandi = tmp
+                jinMalas = userFile[i][0]
+            elif(minCandi == tmp): 
+                jinMalas = bandingkanNamaMalas(jinMalas, userFile[i][0])
+    return jinMalas
 
-def jinTerajin():
-    minTemp = userFile[3][0]
-    for i  in range(3, panjangFile("user.csv")):
-        for j in range(min(length(userFile[i][0]), length(minTemp))): 
-            if(userFile[i][0][j] > minTemp[j]) :
-                break
-            if(userFile[i][0][j] < minTemp[j]): 
-                minTemp = userFile[i][0]
+def bandingkanNamaRajin(userNameJin1 : str, userNameJin2:str)->str: # Membandingkan nama untuk cari jin termalas
+    jinRajin = userNameJin1
+    for i in range(minimum(len(userNameJin1), len(userNameJin2))): 
+        if(userNameJin1[i] < userNameJin2[i]): 
+            break
+        elif(userNameJin1[i] > userNameJin2[i]):
+            jinRajin = userNameJin2
+            break
+    return jinRajin
 
-    return minTemp
+def bandingkanNamaMalas(userNameJin1 : str, userNameJin2:str)->str: # Membandingkan nama untuk cari jin terajin
+    jinMalas = userNameJin1
+    for i in range(minimum(len(userNameJin1), len(userNameJin2))): 
+        if(userNameJin1[i] > userNameJin2[i]): 
+            break
+        elif(userNameJin1[i] < userNameJin2[i]):
+            jinMalas = userNameJin2
+            break
+    return jinMalas
 
-def jumlahJin(tipeJin : str): 
+def jinTerajin()->str: #Mencari jin terajin
+    maxCandi = -999  
+    jinRajin = ""  
+    for i in range(3,panjangFile("user.csv")): 
+        if(userFile[i][2] == "Pembangun"): 
+            tmp = menghitungJumlahCandi(userFile[i][0])
+            if(maxCandi < tmp):
+                maxCandi = tmp
+                jinRajin = userFile[i][0]
+            if(maxCandi == tmp): 
+                jinRajin = bandingkanNamaRajin(jinRajin, userFile[i][0])
+    return jinRajin
+
+def jumlahJin(tipeJin : str)->int: # Mencari jumlah jin berdasarkan tipenya (Pembangun/Pengumpul)
     cnt = 0  
     for i in range(panjangFile("user.csv")): 
         if(userFile[i][2] == tipeJin): 
             cnt+=1
     return cnt
 
-def laporanJin(): 
+def menghitungJumlahCandi(userNameJin : str)->int : #Menghitung jumlah candi yang dibangun oleh "userNameJin"
+    cnt = 0
+    for i in range(1,panjangFile("candi.csv")): 
+        if(daftarCandi[i][1] == userNameJin):
+            cnt +=1 
+    return cnt 
+
+def laporanJin(): #Laporan Jin Utama
     if(userName !=  "Bondowoso"):
         print("Laporan jin hanya dapat diakses oleh akun Bandung Bondowoso.")
         return 0
@@ -704,8 +747,12 @@ def laporanJin():
     print("> Jumlah Pasir: " + str(totalPasir) +  " unit")
     print("> Jumlah Air: " + str(totalAir) +  " unit" ) 
     print("> Jumlah Batu: " + str(totalBatu) +  " unit")    
-#End of Laporan Jin
+# ---------------------------------------------------------------- 
 
+
+# ===============================================================
+# Bagian untuk Exit
+# ===============================================================
 def Exit(): #Prosedur untuk Exit
     panjangFileUser = panjangFile("user.csv")
     panjangFileBahan = panjangFile("bahan_bangunan.csv")
@@ -720,6 +767,7 @@ def Exit(): #Prosedur untuk Exit
         elif(konfirmasiUser == "n" or konfirmasiUser =="N") : 
             break
     sys.exit()
+# ---------------------------------------------------------------- 
 
 def Help(): #Prosedur untuk Help
     print("=========== HELP ===========")
