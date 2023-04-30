@@ -803,6 +803,8 @@ def Help(): #Prosedur untuk Help
         print("   Untuk keluar dari akun yang digunakan sekarang")
         print("2. hancurkancandi")
         print("   Untuk menghancurkan candi yang tersedia")
+        print("3. exit")
+        print("   Untuk keluar dari program dan kembali ke terminal")
     elif(getTipeJin(userName) == "Pembangun"): 
         print("1. logout")
         print("   Untuk keluar dari akun yang digunakan sekarang")
@@ -817,7 +819,6 @@ def Help(): #Prosedur untuk Help
         print("   Untuk mengumpulkan bahan candi")
         print("3. exit")
         print("   Untuk keluar dari program dan kembali ke terminal")
-        
 #Program Utama
 memintaArgs()
 print("Loading...")
