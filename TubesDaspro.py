@@ -181,7 +181,6 @@ def load(namaFile:str,n:int)->list :  #Fungsi load utama -> Mengembalikkan array
             tmpArray[x][i] = tmpStr[i]
         x+=1
         isiFile = f.readline()
-    print(tmpArray)
     return tmpArray
 
 def loadBahanBangunan(): #Prosedur untuk me-load bahan bangunan
@@ -211,6 +210,7 @@ def save(): #Prosedur save
     namaFolder = input("Masukklan nama folder : ")
     print("Saving...")
     namaFolder= namaFolder
+    os.chdir("..")
     if os.path.exists(namaFolder): 
         os.chdir(namaFolder)
     else : 
@@ -736,7 +736,7 @@ def laporanJin(): #Laporan Jin Utama
     totalJinPengumpul : int = jumlahJin("Pengumpul") 
     totalJinPembangun  : int =  jumlahJin("Pembangun")
     totalJin =  totalJinPembangun + totalJinPengumpul
-    if(panjangFile("user.csv") > 3 ): 
+    if(panjangFile("user.csv") >= 6 ): 
         jinterajin = jinTerajin()
         jintermalas = jinTermalas()
     print("> Total jin : " + str(totalJin))
@@ -769,6 +769,11 @@ def Exit(): #Prosedur untuk Exit
     sys.exit()
 # ---------------------------------------------------------------- 
 
+def getTipeJin(userName: str) -> str : 
+    for i in range(panjangFile("user.csv")): 
+        if userFile[i][0] == userName : 
+            return userFile[i][2]
+    
 def Help(): #Prosedur untuk Help
     print("=========== HELP ===========")
     if(userName == "" and userPass == ""): 
@@ -788,15 +793,31 @@ def Help(): #Prosedur untuk Help
         print("5. laporancandi")
         print("   Untuk melihat laporan mengenai candi yang sudah dibangun")
         print("6. batchkumpul")
-        print("   ---")
+        print("   Mengerahkan semua jin Pengumpul untuk mengumpulkan bahan")
         print("7. batchbangun")
-        print("   ---")
+        print("   Mengerahkan semua jin Pembangun untuk membangun banyak candi")
+        print("8. exit")
+        print("   Untuk keluar dari program dan kembali ke terminal")
     elif(userName == "Roro") : 
         print("1. logout")
         print("   Untuk keluar dari akun yang digunakan sekarang")
         print("2. hancurkancandi")
         print("   Untuk menghancurkan candi yang tersedia")
-
+    elif(getTipeJin(userName) == "Pembangun"): 
+        print("1. logout")
+        print("   Untuk keluar dari akun yang digunakan sekarang")
+        print("2. bangun")
+        print("   Untuk membangun candi")
+        print("3. exit")
+        print("   Untuk keluar dari program dan kembali ke terminal")
+    elif(getTipeJin(userName) == "Pengumpul"): 
+        print("1. logout")
+        print("   Untuk keluar dari akun yang digunakan sekarang")
+        print("2. kumpul")
+        print("   Untuk mengumpulkan bahan candi")
+        print("3. exit")
+        print("   Untuk keluar dari program dan kembali ke terminal")
+        
 #Program Utama
 memintaArgs()
 print("Loading...")
