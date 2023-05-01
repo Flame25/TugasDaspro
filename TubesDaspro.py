@@ -287,6 +287,11 @@ def batchbangun():
         print("Mengerahkan %d jin untuk membangun candi"%totalJinPembangun)
         bangunBanyak(totalJinPembangun)
 # ----------------------------------------------------------------
+def absolute(a : int)-> int: 
+    if(a >= 0 ): 
+        return a
+    else : 
+        return -1*a
 
 #Prosedur membangun candi setiap jin dan dimasukkan ke csv
 def bangunBanyak(jumlahJin :int ): 
@@ -306,8 +311,20 @@ def bangunBanyak(jumlahJin :int ):
         jumlahAir += nAir[i]
         jumlahBatu += nBatu[i]
     print("Bahan yang diperlukan : " + str(jumlahPasir) + " pasir, " + str(jumlahBatu) + " batu, " + str(jumlahAir) +" air")
-    if(jumlahPasir > totalPasir or jumlahAir > totalAir or jumlahBatu > totalBatu): 
-        print("Bangun gagal. Kurang %d pasir, %d batu, dan %d air."%(jumlahPasir-totalPasir),(jumlahBatu-totalBatu),(jumlahAir-totalAir))
+    if(jumlahPasir > totalPasir and jumlahAir > totalAir and jumlahBatu > totalBatu): 
+        print("Bangun gagal. Kurang  " + str( absolute(jumlahPasir-totalPasir))+" pasir, " + str(absolute(jumlahBatu-totalBatu))+" batu, dan " + str(absolute(jumlahAir - totalAir))+ " air.")
+    elif(jumlahPasir > totalPasir and jumlahAir > totalAir):
+        print("Bangun gagal. Kurang  " + str( absolute(jumlahPasir-totalPasir))+" pasir dan " + str(absolute(jumlahAir - totalAir))+ " air.")
+    elif(jumlahPasir > totalPasir and jumlahBatu > totalBatu): 
+        print("Bangun gagal. Kurang  " + str( absolute(jumlahPasir-totalPasir))+" pasir dan " + str(absolute(jumlahBatu-totalBatu))+" batu.")
+    if(jumlahAir > totalAir and jumlahBatu > totalBatu): 
+        print("Bangun gagal. Kurang " + str(absolute(jumlahBatu-totalBatu))+" batu dan " + str(absolute(jumlahAir - totalAir))+ " air.")
+    elif(jumlahAir > totalAir): 
+        print("Bangun gagal. Kurang " + str(absolute(jumlahAir-totalAir))+" air.")
+    elif(jumlahBatu > totalBatu): 
+        print("Bangun gagal. Kurang " + str(absolute(jumlahBatu-totalBatu))+" batu.")
+    elif(jumlahPasir > totalPasir): 
+        print("Bangun gagal. Kurang " + str(absolute(jumlahPasir-totalPasir))+" pasir.")
         return 0
     else : 
         totalPasir -= jumlahPasir
@@ -339,7 +356,6 @@ def getJinPembangun() -> list:
     for i in range(panjangFile("user.csv")): 
         if(userFile[i][2] == "Pembangun"): 
             for j in range(3): 
-                print(i,j)
                 sebuahArray[x][j] = userFile[i][j]
             x+=1
     return sebuahArray
@@ -357,8 +373,8 @@ def switch(userCommand): #Fungsi switch untuk input command game
         logIn()    
     elif(userCommand == "load"): 
         global userFile, daftarCandi, bahanBangunan 
-        userFile = load("user.csv",3)
-        daftarCandi = load("candi.csv",5)
+        loadUserFile()
+        loadDaftarCandi()
         bahanBangunan = load("bahan_bangunan.csv",3)
         if(panjangFile("bahan_bangunan.csv")>1):
             loadBahanBangunan()
@@ -398,10 +414,11 @@ def switch(userCommand): #Fungsi switch untuk input command game
 # ---------------------------------------------------------------- 
 
 # Fungsi yang bisa diakses Roro Jonggrang
-    elif(userCommand == "ayamberkokok"): 
-        ayamBerkokok()
-    elif(userCommand == "hancurkancandi"):
-        hancurkanCandi()
+    if(userName == "Roro"):
+        if(userCommand == "ayamberkokok"): 
+            ayamBerkokok()
+        elif(userCommand == "hancurkancandi"):
+            hancurkanCandi()
 # ---------------------------------------------------------------- 
 
 def summonJin(): #Prosedur summon jin
@@ -450,13 +467,13 @@ def getJin(userName): #Fungsi berguna untuk mengambil array yang hanya berisi ji
     for i in range(panjangFile("user.csv")): 
         for j in range(3): 
             if(userFile[i][0] == userName ): 
-                arrayJin = [i]
+                arrayJin = userFile[i]
     return arrayJin
  
 def ubahTipeJin(): #Fungsi utama ubah tipe jin
     while True  : 
         userNameJin = input("Masukkan username jin : ")
-        if( cekUser(userNameJin)) : 
+        if( cekUser(userNameJin, userFile, panjangFile("user.csv"))) : 
             break 
         else : 
             print("Tidak ada jin dengan username tersebut.")
@@ -464,7 +481,7 @@ def ubahTipeJin(): #Fungsi utama ubah tipe jin
     while True :
         if(arrayJin[2] == "Pengumpul"): 
             konfirmasiUser = input('Jin ini bertipe “Pengumpul”. Yakin ingin mengubah ke tipe “Pembangun” (Y/N)? ')
-        elif(arrayJin[2] == "Pembangung"): 
+        elif(arrayJin[2] == "Pembangun"): 
             konfirmasiUser = input('Jin ini bertipe “Pembangun”. Yakin ingin mengubah ke tipe “Pengumpul” (Y/N)? ')
         else : 
             print("Error")
@@ -528,7 +545,6 @@ def ayamBerkokok(): #Prosedur untuk Ayam Berkokok
     if(panjangFile("candi.csv") -1 == 100): 
         print("Yah, Bandung Bondowoso memenangkan permainan!")
     else : 
-        
         print("Selamat, Roro Jonggrang memenangkan permainan!")
         print("\n")
         print("*Bandung Bondowoso angry noise* \nRoro Jonggrang dikutuk menjadi candi.")
@@ -781,6 +797,10 @@ def Help(): #Prosedur untuk Help
         print("   Untuk masuk menggunakan akun")
         print("2. exit")
         print("   Untuk keluar dari program dan kembali ke terminal")
+        print("3. save")
+        print("   Untuk menyimpan progress")
+        print("4. load")
+        print("   Untuk me-load (refresh) data")
     elif(userName == "Bondowoso"): 
         print("1. logout")
         print("   Untuk keluar dari akun yang digunakan sekarang")
@@ -796,15 +816,27 @@ def Help(): #Prosedur untuk Help
         print("   Mengerahkan semua jin Pengumpul untuk mengumpulkan bahan")
         print("7. batchbangun")
         print("   Mengerahkan semua jin Pembangun untuk membangun banyak candi")
-        print("8. exit")
+        print("8. ubahjin")
+        print("   Mengerahkan semua jin Pembangun untuk membangun banyak candi")
+        print("9. exit")
         print("   Untuk keluar dari program dan kembali ke terminal")
+        print("10. save")
+        print("   Untuk menyimpan progress")
+        print("11. load")
+        print("   Untuk me-load (refresh) data")
     elif(userName == "Roro") : 
         print("1. logout")
         print("   Untuk keluar dari akun yang digunakan sekarang")
         print("2. hancurkancandi")
         print("   Untuk menghancurkan candi yang tersedia")
-        print("3. exit")
+        print("3. ayamberkokok")
+        print("   Untuk mengakhiri permainan")
+        print("4. exit")
         print("   Untuk keluar dari program dan kembali ke terminal")
+        print("5. save")
+        print("   Untuk menyimpan progress")
+        print("6. load")
+        print("   Untuk me-load (refresh) data")
     elif(getTipeJin(userName) == "Pembangun"): 
         print("1. logout")
         print("   Untuk keluar dari akun yang digunakan sekarang")
@@ -812,6 +844,10 @@ def Help(): #Prosedur untuk Help
         print("   Untuk membangun candi")
         print("3. exit")
         print("   Untuk keluar dari program dan kembali ke terminal")
+        print("4. save")
+        print("   Untuk menyimpan progress")
+        print("5. load")
+        print("   Untuk me-load (refresh) data")
     elif(getTipeJin(userName) == "Pengumpul"): 
         print("1. logout")
         print("   Untuk keluar dari akun yang digunakan sekarang")
@@ -819,6 +855,10 @@ def Help(): #Prosedur untuk Help
         print("   Untuk mengumpulkan bahan candi")
         print("3. exit")
         print("   Untuk keluar dari program dan kembali ke terminal")
+        print("4. save")
+        print("   Untuk menyimpan progress")
+        print("5. load")
+        print("   Untuk me-load (refresh) data")
 #Program Utama
 memintaArgs()
 print("Loading...")
